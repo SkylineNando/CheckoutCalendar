@@ -1,0 +1,181 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<style>
+ .selected-date {
+            background-color: orange;
+            color: orangered;
+        }
+
+        /* Estilos para o input de tipo date */
+        input[type="date"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Estilos para o valor do input de tipo date */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            color: orangered;
+        }
+
+  
+        /* Resto dos seus estilos aqui */
+        .centered-input {
+    text-align: center;
+    width: 10px;
+  }
+ 
+        .custom-selector {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 40px;
+           
+            border-radius: 4px;
+        }
+
+        .selector-display {
+            padding: 0 10px;
+            font-size: 16px;
+        }
+
+        .selector-buttons {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .selector-button {
+            background-color: orange;
+            color: #fff;
+            font-size: 12px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .selector-button:hover {
+            background-color: orangered;
+            color: #fff;
+            font-size: 12px;
+        }
+    </style> 
+
+    <form id="reservaForm">
+                  <label for="data_entrada">Data de Entrada:</label>
+            <input type="date" id="data_entrada" name="data_entrada" required><br><br>
+
+            <label for="data_saida">Data de Saída:</label>
+            <input type="date" id="data_saida" name="data_saida" required><br><br>
+
+        
+        <div class="custom-selector">
+        <label class="col-8">Quantidade de Pessoas:</label>
+            <div class="selector-button col-auto" data-type="pessoas" data-operation="decrease"><i class="icon-minus"></i></div>            
+            <input type="text" id="quantidadePessoas" class="selector-display centered-input" value="1"  name="quantidadePessoas"  data-type="pessoas" required>
+            <div class="selector-button " data-type="pessoas" data-operation="increase"><i class="icon-plus"></i></div>
+        </div>
+        <br><br>
+
+        <div class="custom-selector">
+        <label class="col-8">Quantidade de Crianças:</label>
+            <div class="selector-button" data-type="criancas" data-operation="decrease"><i class="icon-minus"></i></div>
+             <input type="text" class="selector-display centered-input"  id="quantidadeCriancas" value="0" data-type="criancas" name="quantidadeCriancas" required>
+            <div class="selector-button" data-type="criancas" data-operation="increase"><i class="icon-plus"></i></div>
+        </div>
+        <br><br>
+        <div class="col-12">
+                    <button class="button -dark-1 px-35 h-60 col-12 bg-blue-1 text-white">
+                    Verificar disponibilidade
+                    </button>
+                  </div>
+    </form>
+    <div id="mensagem"></div>
+    <script>
+        $(document).ready(function() {
+            var quantidadePessoas = 1;
+            var quantidadeCriancas = 0;
+
+            $(".selector-button").click(function() {
+                var tipo = $(this).data("type");
+                var operacao = $(this).data("operation");
+
+                if (tipo === "pessoas") {
+                    if (operacao === "increase" && quantidadePessoas < 10) {
+                        quantidadePessoas++;
+                    } else if (operacao === "decrease" && quantidadePessoas > 1) {
+                        quantidadePessoas--;
+                    }
+                    updateSelectorDisplay("pessoas");
+                } else if (tipo === "criancas") {
+                    if (operacao === "increase" && quantidadeCriancas < 10) {
+                        quantidadeCriancas++;
+                    } else if (operacao === "decrease" && quantidadeCriancas > 0) {
+                        quantidadeCriancas--;
+                    }
+                    updateSelectorDisplay("criancas");
+                }
+            });
+
+            function updateSelectorDisplay(tipo) {
+                if (tipo === "pessoas") {
+                    $(".selector-display[data-type='pessoas']").text(quantidadePessoas);
+                    $("#quantidadePessoas").val(quantidadePessoas);
+                } else if (tipo === "criancas") {
+                    $(".selector-display[data-type='criancas']").text(quantidadeCriancas);
+                    $("#quantidadeCriancas").val(quantidadeCriancas);
+                }
+            }
+        });
+    </script>
+ <script>
+$(document).ready(function() {
+    $("#data_entrada").change(function() {
+        var entrada = new Date($(this).val());
+        entrada.setDate(entrada.getDate() + 2); // Adicionando 2 dias
+        
+        var dd = String(entrada.getDate()).padStart(2, '0');
+        var mm = String(entrada.getMonth() + 1).padStart(2, '0');
+        var yyyy = entrada.getFullYear();
+        var saida = yyyy + '-' + mm + '-' + dd;
+
+        $("#data_saida").val(saida);
+    });
+
+    $("#reservaForm").submit(function(event) {
+        event.preventDefault();
+
+        var dataEntrada = new Date($("#data_entrada").val());
+        var dataSaida = new Date($("#data_saida").val());
+
+        if (dataSaida <= dataEntrada) {
+            // Usando SweetAlert para mostrar a mensagem de erro
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'A data de saída deve ser posterior à data de entrada.'
+            });
+        } else {
+            var formData = $(this).serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "enviar_whatsapp.php",
+                data: formData,
+                success: function(response) {
+                    // Usando SweetAlert para mostrar a mensagem de sucesso
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso',
+                        text: response
+                    });
+                }
+            });
+        }
+    });
+});
+</script>
