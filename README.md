@@ -36,6 +36,21 @@ Integration: The system must be integrated with the accommodation database and u
 
 Scalability: The system must be able to handle multiple simultaneous queries without affecting performance.
 
+
+The code shown is an excerpt from an HTML page that creates a booking form with input and output date fields. It also incorporates functionality to interact with these fields and to display messages using the SweetAlert library.
+
+The JavaScript script that runs when the document is ready ($(document).ready(function() {...}) includes the following functionality:
+
+When the input date is selected, the code calculates the output date automatically, adding 2 days to the input date. The output date value is then formatted and entered into the corresponding field.
+
+When the form is submitted, the code prevents the form's default behavior and performs the following actions:
+
+Checks if the output date is later than the input date.
+If validation fails, displays an error message using Swal.fire from the SweetAlert library.
+If the validation is successful, it sends the form data via AJAX to a PHP file called "send_whatsapp.php".
+Upon successful submission, display a success message using Swal.fire.
+This code is a combination of HTML, JavaScript and the SweetAlert library to create an interactive booking form and display error/success messages in an attractive way. Make sure you embed the code in your HTML page and include the necessary dependencies such as jQuery and SweetAlert (using the link provided in the code).
+
 User Experience: The interface must be intuitive and user-friendly, ensuring a pleasant experience.
 
 Security: Users' personal data must be handled securely and in compliance with privacy regulations.
